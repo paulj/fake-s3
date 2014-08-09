@@ -163,6 +163,7 @@ module FakeS3
 
         match=request.content_type.match(/^multipart\/form-data; boundary=(.+)/)
       	boundary = match[1] if match
+        form_content_type = nil
         if boundary
           boundary = WEBrick::HTTPUtils::dequote(boundary)
           filedata = WEBrick::HTTPUtils::parse_form_data(request.body, boundary)
@@ -170,6 +171,7 @@ module FakeS3
           File.open(content, 'wb') do |f|
             f << filedata['file']
           end
+          form_content_type = filedata['Content-Type']
         else
           File.open(content,'wb') do |f|
             request.body do |chunk|
@@ -178,6 +180,8 @@ module FakeS3
           end
         end
         metadata_struct = create_metadata(content,request)
+        metadata_struct[:content_type] = form_content_type if form_content_type
+
         File.open(metadata,'w') do |f|
           f << YAML::dump(metadata_struct)
         end
