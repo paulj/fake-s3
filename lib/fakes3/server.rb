@@ -135,6 +135,7 @@ module FakeS3
       response.status = 200
       response.body = ""
       response['Content-Type'] = "text/xml"
+      response['Access-Control-Allow-Origin']='*'
 
       case s_req.type
       when Request::COPY
@@ -212,6 +213,8 @@ module FakeS3
     def do_OPTIONS(request, response)
       super
       response["Access-Control-Allow-Origin"]="*"
+      response["Access-Control-Allow-Methods"]="PUT, POST"
+      response["Access-Control-Allow-Headers"]="content-disposition,content-md5,content-type"
     end  
 
     private
